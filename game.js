@@ -14,6 +14,8 @@ let availableQuestions = [];
 
 let questions = [];
 
+let startTime, endTime;
+
 fetch("https://opentdb.com/api.php?amount=10&category=21&difficulty=easy&type=multiple"
 )
 .then(res => {
@@ -51,6 +53,7 @@ startGame = () => {
   questionCounter = 0;
   score = 0;
   availableQuestions = [...questions];
+  startTime = new Date().getTime();
   getNewQuestion();
   game.classList.remove('hidden');
   loader.classList.add('hidden');
@@ -58,9 +61,12 @@ startGame = () => {
 
 getNewQuestion = () => {
 
-  if(availableQuestions.length === 0 || questionCounter > MAX_QUESTIONS){
+  if (availableQuestions.length === 0 || questionCounter >= MAX_QUESTIONS) {
+    endTime = new Date().getTime(); // End the timer
+    const timeTaken = endTime - startTime;
     localStorage.setItem("mostRecentScore", score);
-    //gå till end pagen
+    localStorage.setItem("timeTaken", timeTaken); // Store the time taken in milliseconds
+    // Go to end page
     return window.location.assign("/end.html");
   }
   questionCounter++;

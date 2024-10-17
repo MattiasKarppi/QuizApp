@@ -1,5 +1,5 @@
 :root {
-  background-color: #ecf5ff;
+  background-color: rgb(240,230,140);
   font-size: 62.5%;
 }
 
@@ -20,7 +20,7 @@ h4 {
 
 h1 {
 font-size: 5.4rem;
-color: #56a5eb;
+color: #000000;
 margin-bottom: 5rem;
 }
 
@@ -83,10 +83,10 @@ h3 {
   padding: 1rem 0;
   width: 20rem;
   text-align: center;
-  border: 0.1rem solid #56a5eb;
+  border: 0.1rem solid #333;
   margin-bottom: 1rem;
   text-decoration: none;
-  color: #56a5eb;
+  color: #333;
 background-color: white;
 }
 
@@ -122,4 +122,13 @@ box-shadow: 0 0.1rem 1.4rem 0 rgba(86, 185, 235, 0.5);
 
 input::placeholder {
   color: #aaa;
+}
+
+
+@media only screen and (max-width: 600px) {
+  h2 {
+    font-size: 3.2rem;
+    margin-bottom: 4rem;
+    font-weight: 700;
+  }
 }

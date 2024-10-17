@@ -51,13 +51,13 @@ justify-content: space-between;
 #progressBar {
   width: 20rem;
   height: 4rem;
-  border: 0.3rem solid #8a3b03;
+  border: 0.3rem solid darkslategray;
   margin-top: 1.5rem;
 }
 
 #progressBarFull {
   height: 3.4rem;
-  background-color: #8a3b03;
+  background-color: darkslategray;
   width: 0%;
   
 }

@@ -1,3 +1,5 @@
+const urlParams = new URLSearchParams(window.location.search);
+const quizType = urlParams.get('quiz');
 const question = document.getElementById("question");
 const choices = Array.from(document.getElementsByClassName("choice-text"));
 const progressText = document.getElementById("progressText");
@@ -16,35 +18,37 @@ let questions = [];
 
 let startTime, endTime;
 
-fetch("https://opentdb.com/api.php?amount=10&category=21&difficulty=easy&type=multiple"
-)
-.then(res => {
-return res.json();
-})
-.then(loadedQuestions => {
-console.log(loadedQuestions.results);
-questions = loadedQuestions.results.map(loadedQuestion => {
-  const formattedQuestion = {
-   question: loadedQuestion.question
-  };
+const quizUrls = {
+  sports: "https://opentdb.com/api.php?amount=10&category=21&difficulty=easy&type=multiple",
+  animals: "https://opentdb.com/api.php?amount=10&category=27&difficulty=easy&type=multiple"
+};
 
-  const answerChoices = [...loadedQuestion.incorrect_answers];
-  formattedQuestion.answer = Math.floor(Math.random() * 3) +1;
-answerChoices.splice(formattedQuestion.answer -1, 0, loadedQuestion.correct_answer);
+fetch(quizUrls[quizType])
+  .then(res => {
+    return res.json();
+  })
+  .then(loadedQuestions => {
+    questions = loadedQuestions.results.map(loadedQuestion => {
+      const formattedQuestion = {
+        question: loadedQuestion.question
+      };
 
-answerChoices.forEach((choice, index) => {
-  formattedQuestion["choice" + (index+1)] = choice;
-})
+      const answerChoices = [...loadedQuestion.incorrect_answers];
+      formattedQuestion.answer = Math.floor(Math.random() * 3) + 1;
+      answerChoices.splice(formattedQuestion.answer - 1, 0, loadedQuestion.correct_answer);
 
-return formattedQuestion;
-});
+      answerChoices.forEach((choice, index) => {
+        formattedQuestion["choice" + (index + 1)] = choice;
+      });
 
-startGame();
-})
+      return formattedQuestion;
+    });
 
-.catch( err => {
-  console.error(err);
-});
+    startGame();
+  })
+  .catch(err => {
+    console.error(err);
+  });
 
 const CORRECT_BONUS = 1;
 const MAX_QUESTIONS = 10;
@@ -60,60 +64,51 @@ startGame = () => {
 };
 
 getNewQuestion = () => {
-
   if (availableQuestions.length === 0 || questionCounter >= MAX_QUESTIONS) {
-    endTime = new Date().getTime(); // End the timer
+    endTime = new Date().getTime();
     const timeTaken = endTime - startTime;
     localStorage.setItem("mostRecentScore", score);
-    localStorage.setItem("timeTaken", timeTaken); // Store the time taken in milliseconds
-    // Go to end page
+    localStorage.setItem("timeTaken", timeTaken);
+    localStorage.setItem("quizType", quizType);
     return window.location.assign("/end.html");
   }
   questionCounter++;
   progressText.innerText = `Question ${questionCounter}/${MAX_QUESTIONS}`;
-
-  //uppdatera progress bar
   progressBarFull.style.width = `${(questionCounter / MAX_QUESTIONS) * 100}%`;
 
   const questionIndex = Math.floor(Math.random() * availableQuestions.length);
   currentQuestion = availableQuestions[questionIndex];
   question.innerText = currentQuestion.question;
 
-  choices.forEach (choice => {
+  choices.forEach(choice => {
     const number = choice.dataset['number'];
     choice.innerText = currentQuestion['choice' + number];
   });
 
-availableQuestions.splice(questionIndex, 1);
-acceptingAnswers = true;
+  availableQuestions.splice(questionIndex, 1);
+  acceptingAnswers = true;
 };
 
- choices.forEach(choice => {
+choices.forEach(choice => {
   choice.addEventListener("click", e => {
-    if(!acceptingAnswers) return;
+    if (!acceptingAnswers) return;
 
     acceptingAnswers = false;
     const selectedChoice = e.target;
     const selectedAnswer = selectedChoice.dataset["number"];
 
-    console.log(`Selected answer: ${selectedAnswer}`);
-    console.log(`Correct answer: ${currentQuestion.answer}`);
-    console.log(`Type of selected answer: ${typeof selectedAnswer}`);
-    console.log(`Type of correct answer: ${typeof currentQuestion.answer}`);
-
     const classToApply = selectedAnswer == currentQuestion.answer ? "correct" : "incorrect";
 
-  if(classToApply === 'correct') {
-    incrementScore(CORRECT_BONUS);
-  }
+    if (classToApply === 'correct') {
+      incrementScore(CORRECT_BONUS);
+    }
 
     selectedChoice.parentElement.classList.add(classToApply);
 
-setTimeout(() => {
- selectedChoice.parentElement.classList.remove(classToApply);
-  getNewQuestion();
-}, 1000);
-
+    setTimeout(() => {
+      selectedChoice.parentElement.classList.remove(classToApply);
+      getNewQuestion();
+    }, 1000);
   });
 });
 
@@ -121,5 +116,3 @@ incrementScore = num => {
   score += num;
   scoreText.innerText = score;
 };
-
-
